@@ -1,10 +1,15 @@
 ## Client Manager
 
 ```
-# Install pip dependancy manager
+# Install pip dependency manager
 python get-pip.py --user
 pip install faker
 ```
+
+Bonus:
+
+https://rich.readthedocs.io/en/stable/introduction.html
+https://click.palletsprojects.com/en/8.1.x/
 
 ### CliManager v1.0
 
