@@ -1,12 +1,15 @@
 def view_clients(clients):
     if clients:
-        print("Client List:")
+        print("-" * 65)
+        print("  ID     Name                Address               Total spent $")
+        print("-" * 65)
+
         for client in clients:
-            print("ID:", client['ID'])
-            print("Name:", client['Name'])
-            print("Address:", client['Address'])
-            print("Total Amount Spent:", client['Total Amount Spent'])
-            print()
+            print("|",     client['ID'],     "|",          client['Name'],          "|",       client['Address'],
+                  "|",                       client['Total Amount Spent'],      "|")
+            print("-" * 65)
+
+        print("\nClient List:")
         print(clients)
     else:
         print("No clients found.")
@@ -49,29 +52,36 @@ def edit_client(clients):
         print("Address:", client['Address'])
         print("Total Amount Spent:", client['Total Amount Spent'])
 
-        new_client_id = input("Enter updated client ID (press Enter to keep current): ")
+        new_client_id = input("\nEnter updated client ID (press Enter to keep current): ")
         if new_client_id:
             client['ID'] = new_client_id
+
         new_client_name = input("Enter updated client name (press Enter to keep current): ").title()
         if new_client_name:
             client['Name'] = new_client_name
+
         new_client_address = input("Enter updated client address (press Enter to keep current): ").title()
         if new_client_address:
             client['Address'] = new_client_address
-        new_amount_spent = input("Enter updated total amount spent (press Enter to keep current): ")
-        if new_amount_spent:
-            client["Total Amount Spent"] = new_amount_spent
+
+        while True:
+            new_amount_spent = input("Enter updated total amount spent (press Enter to keep current): ")
+            if new_amount_spent == '':
+                break
+            elif new_amount_spent.isdigit():
+                client["Total Amount Spent"] = new_amount_spent
+                break
+            else:
+                print("Invalid option. Please enter a number.")
 
         print("Client details updated successfully!")
-
     else:
         print("Client not found.")
-
+    print()
 
 def delete_client(clients):
     client_id = input("Enter client ID to delete: ")
     client = find_client_by_id(clients, client_id)
-
     if client:
         clients.remove(client)
         print("Client deleted successfully!")
@@ -89,13 +99,13 @@ def main():
         print("*" * 29)
 
         prompt = """
-    Select the number of your choice to display screen:   
-        [1] - Print my clients
-        [2] - Add a client
-        [3] - Edit a client
-        [4] - Delete a client
-        [5] - Exit
-    """
+Select the number of your choice to display screen:   
+    [1] - Print my clients
+    [2] - Add a client
+    [3] - Edit a client
+    [4] - Delete a client
+    [5] - Exit
+"""
         choice = input(prompt)
 
         if choice == '1':
