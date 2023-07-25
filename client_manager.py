@@ -1,3 +1,6 @@
+from pprint import pprint
+
+
 def view_clients(clients):
     if clients:
         print("-" * 65)
@@ -10,16 +13,36 @@ def view_clients(clients):
             print("-" * 65)
 
         print("\nClient List:")
-        print(clients)
+        pprint(clients)
     else:
         print("No clients found.")
     print()
 
+
 def add_client(clients):
     client = {}
-    client['ID'] = input("Enter client ID: ")
-    client['Name'] = input("Enter client name: ").title()
-    client['Address'] = input("Enter client address: ").title()
+    while True:
+        try:
+            client['ID'] = int(input("Enter client ID number: "))
+        except ValueError:
+            print("Invalid option. Please enter a number.")
+        else:
+            break
+
+    while True:
+        client['Name'] = input("Enter client name: ").title()
+        if client['Name'] == '' or client['Name'].isdigit():
+            print("Invalid option. Please enter a name.")
+        else:
+            break
+
+    while True:
+        client['Address'] = input("Enter client address: ").title()
+        if client['Address'] == '' or client['Address'].isdigit():
+            print("Invalid option. Please enter an address.")
+        else:
+            break
+
     while True:
         try:
             client['Total Amount Spent'] = int(input("Enter total amount spent: "))
