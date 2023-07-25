@@ -57,7 +57,7 @@ def add_client(clients):
 
 def find_client_by_id(clients, client_id):
     for client in clients:
-        if client['ID'] == client_id:
+        if client['ID'] == int(client_id):
 
             return client
     return None
