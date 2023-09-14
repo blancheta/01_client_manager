@@ -2,12 +2,12 @@ from sqlalchemy import create_engine, ForeignKey, Column, String, Integer, CHAR
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-'''we create Base, which will return a class - to inherit from; the base for our first class (Person):'''
+'''we create Base, which will return a class - to inherit from; the base for our first class (Client):'''
 Base = declarative_base()
 
 
 class Client(Base):
-    __tablename__ = "people"
+    __tablename__ = "clients"
     id = Column("id", Integer, primary_key=True)
     firstname = Column("firstname", String)
     lastname = Column("lastname", String)
