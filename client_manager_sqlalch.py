@@ -1,19 +1,56 @@
 from pprint import pprint
 
+from sqlalchemy import create_engine, ForeignKey, Column, String, Integer, CHAR
+# from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, declarative_base
+
+'''we create Base, which will return a class - to inherit from; the base for our first class (Client):'''
+Base = declarative_base()
+
+
+class Client(Base):
+    __tablename__ = "clients"
+    id = Column("id", Integer, primary_key=True, autoincrement=True) # VEZI CE E CU autoincrement!!!!
+    firstname = Column("firstname", String)
+    lastname = Column("lastname", String)
+    address = Column("address", String)
+    total_spent = Column("total_spent", Integer, default=0) # vezi CE E CU default=0
+
+    '''we define a constructor'''
+
+    def __init__(self, id, first, last, address, total_spent=0):
+        self.id = id
+        self.firstname = first
+        self.lastname = last
+        self.address = address
+        self.total_spent = total_spent
+
+    def __repr__(self):
+        return f"({self.id}) {self.firstname} {self.lastname} ({self.address}, {self.total_spent})"
+
+
+engine = create_engine("sqlite:///mydb_client_manager.db", echo=True)
+Base.metadata.create_all(bind=engine)
+
+Session = sessionmaker(bind=engine)
+session = Session()
+
+# results = session.query(Client).all()
+
 
 def view_clients(clients):
     if clients:
         print("-" * 65)
-        print("  ID     Name                Address               Total spent $")
+        print("  ID     First Name   Last Name             Address               Total spent $")
         print("-" * 65)
 
         for client in clients:
-            print("|",     client['ID'],     "|",          client['Name'],          "|",       client['Address'],
-                  "|",                       client['Total Amount Spent'],      "|")
+            print("|",     client['ID'],     "|",          client['First Name'],    client['Last Name'],         "|",
+            client['Address'],                 "|",                     client['Total Amount Spent'],      "|")
             print("-" * 65)
 
         print("\nClient List:")
-        pprint(clients)
+        pprint(clients, width=30)
     else:
         print("No clients found.")
     print()
@@ -30,8 +67,15 @@ def add_client(clients):
             break
 
     while True:
-        client['Name'] = input("Enter client name: ").title()
-        if client['Name'] == '' or client['Name'].isdigit():
+        client['First Name'] = input("Enter client's first name: ").title()
+        if client['First Name'] == '' or client['First Name'].isdigit():
+            print("Invalid option. Please enter a name.")
+        else:
+            break
+
+    while True:
+        client['Last Name'] = input("Enter client's last name: ").title()
+        if client['Last Name'] == '' or client['Last Name'].isdigit():
             print("Invalid option. Please enter a name.")
         else:
             break
@@ -51,6 +95,20 @@ def add_client(clients):
         else:
             break
     clients.append(client)
+
+    # client = Client(client['ID'], client['First Name'], client['Last Name'], client['Address'], client['Total Amount Spent'])
+    id = client["ID"]
+    first = client["First Name"]
+    last = client["Last Name"]
+    address = client["Address"]
+    total_spent = client["Total Amount Spent"]
+
+    client = Client(id, first, last, address, total_spent)
+
+
+    session.add(client)
+    session.commit()
+
     print()
     print("Client added successfully!\n")
 
