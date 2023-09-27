@@ -1,7 +1,8 @@
 from pprint import pprint
-
-from sqlalchemy import create_engine, ForeignKey, Column, String, Integer, CHAR
-# from sqlalchemy.ext.declarative import declarative_base
+from rich.console import Console
+from rich.table import Table
+from sqlalchemy import create_engine, ForeignKey, Column, String, Integer
+# from sqlalchemy.ext.declarative import declarative_base It's deprecated. Now it belongs to sqlalchemy.orm.
 from sqlalchemy.orm import sessionmaker, declarative_base
 
 '''we create Base, which will return a class - to inherit from; the base for our first class (Client):'''
@@ -40,14 +41,20 @@ session = Session()
 
 def view_clients(clients):
     if clients:
-        print("-" * 65)
-        print("  ID     First Name   Last Name             Address               Total spent $")
-        print("-" * 65)
+        table = Table(title='Clients', show_lines=True, min_width=100)
+
+        table.add_column("ID", justify='right', style='cyan')
+        table.add_column("First Name", justify='center', style='magenta')
+        table.add_column("Last Name", justify='center', style='magenta')
+        table.add_column("Address", justify='center', style='magenta')
+        table.add_column("Total Amount Spent $", justify='right', style='green')
 
         for client in clients:
-            print("|",     client['ID'],     "|",          client['First Name'],    client['Last Name'],         "|",
-            client['Address'],                 "|",                     client['Total Amount Spent'],      "|")
-            print("-" * 65)
+            table.add_row(str(client['ID']), str(client['First Name']), str(client['Last Name']),
+                          str(client['Address']), str(client['Total Amount Spent']))
+
+        console = Console()
+        console.print(table)
 
         print("\nClient List:")
         pprint(clients, width=30)
@@ -129,7 +136,8 @@ def edit_client(clients):
     if client:
         print("\nClient Details:")
         print("ID:", client['ID'])
-        print("Name:", client['Name'])
+        print("First Name:", client['First Name'])
+        print("Last Name:", client['Last Name'])
         print("Address:", client['Address'])
         print("Total Amount Spent:", client['Total Amount Spent'])
 
@@ -137,9 +145,13 @@ def edit_client(clients):
         if new_client_id:
             client['ID'] = new_client_id
 
-        new_client_name = input("Enter updated client name (press Enter to keep current): ").title()
-        if new_client_name:
-            client['Name'] = new_client_name
+        new_client_first_name = input("Enter updated client first name (press Enter to keep current): ").title()
+        if new_client_first_name:
+            client['First Name'] = new_client_first_name
+
+        new_client_last_name = input("Enter updated client last name (press Enter to keep current): ").title()
+        if new_client_last_name:
+            client['Last Name'] = new_client_last_name
 
         new_client_address = input("Enter updated client address (press Enter to keep current): ").title()
         if new_client_address:
