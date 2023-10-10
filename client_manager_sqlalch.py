@@ -136,41 +136,42 @@ def edit_client():
     if client_id:
         client = session.get(Client, client_id)
 
-        if client:
-            print("\nClient Details:")
-            print("ID:", client.id)
-            print("First Name:", client.firstname)
-            print("Last Name:", client.lastname)
-            print("Address:", client.address)
-            print("Total Amount Spent:", client.total_spent)
+        print("\nClient Details:")
+        print("ID:", client.id)
+        print("First Name:", client.firstname)
+        print("Last Name:", client.lastname)
+        print("Address:", client.address)
+        print("Total Amount Spent:", client.total_spent)
 
-            new_client_id = input("\nEnter updated client ID (press Enter to keep current): ")
-            if new_client_id:
-                client.id = new_client_id
+        new_client_id = input("\nEnter updated client ID (press Enter to keep current): ")
+        if new_client_id:
+            client.id = new_client_id
 
-            new_client_first_name = input("Enter updated client first name (press Enter to keep current): ").title()
-            if new_client_first_name:
-                client.firstname = new_client_first_name
+        new_client_first_name = input("Enter updated client first name (press Enter to keep current): ").title()
+        if new_client_first_name:
+            client.firstname = new_client_first_name
 
-            new_client_last_name = input("Enter updated client last name (press Enter to keep current): ").title()
-            if new_client_last_name:
-                client.lastname = new_client_last_name
+        new_client_last_name = input("Enter updated client last name (press Enter to keep current): ").title()
+        if new_client_last_name:
+            client.lastname = new_client_last_name
 
-            new_client_address = input("Enter updated client address (press Enter to keep current): ").title()
-            if new_client_address:
-                client.address = new_client_address
+        new_client_address = input("Enter updated client address (press Enter to keep current): ").title()
+        if new_client_address:
+            client.address = new_client_address
 
-            while True:
-                new_amount_spent = input("Enter updated total amount spent (press Enter to keep current): ")
-                if new_amount_spent == '':
-                    break
-                elif new_amount_spent.isdigit():
-                    client.total_spent = new_amount_spent
-                    break
-                else:
-                    print("Invalid option. Please enter a number.")
+        while True:
+            new_amount_spent = input("Enter updated total amount spent (press Enter to keep current): ")
+            if new_amount_spent == '':
+                break
+            elif new_amount_spent.isdigit():
+                client.total_spent = new_amount_spent
+                break
+            else:
+                print("Invalid option. Please enter a number.")
 
-            print("Client details updated successfully!")
+        session.commit() # added, otherwise the db will not update
+
+        print("Client details updated successfully!")
     else:
         print()
         print("Client not found!")
@@ -182,12 +183,13 @@ def delete_client():
     if client_id:
         client = session.get(Client, client_id)
 
-        if client:
-            session.delete(client)
+        session.delete(client)
+        session.commit() # added, otherwise the db will not update
 
-            print("*" * 29)
-            print("Client deleted successfully!")
-            print()
+        print("*" * 29)
+        print()
+        print("Client deleted successfully!")
+        print()
     else:
         print()
         print("Client not found!")
