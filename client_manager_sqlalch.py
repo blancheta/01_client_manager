@@ -1,7 +1,7 @@
 from pprint import pprint
 from rich.console import Console
 from rich.table import Table
-from sqlalchemy import create_engine, ForeignKey, Column, String, Integer
+from sqlalchemy import create_engine, Column, String, Integer
 # from sqlalchemy.ext.declarative import declarative_base It's deprecated. Now it belongs to sqlalchemy.orm.
 from sqlalchemy.orm import sessionmaker, declarative_base
 
@@ -11,11 +11,11 @@ Base = declarative_base()
 
 class Client(Base):
     __tablename__ = "clients"
-    id = Column("id", Integer, primary_key=True, autoincrement=True) # VEZI CE E CU autoincrement!!!!
+    id = Column("id", Integer, primary_key=True, autoincrement=True)
     firstname = Column("firstname", String)
     lastname = Column("lastname", String)
     address = Column("address", String)
-    total_spent = Column("total_spent", Integer, default=0) # vezi CE E CU default=0
+    total_spent = Column("total_spent", Integer, default=0)
 
     '''we define a constructor'''
 
@@ -32,14 +32,14 @@ class Client(Base):
 
 engine = create_engine("sqlite:///mydb_client_manager.db", echo=True)
 Base.metadata.create_all(bind=engine)
-
 Session = sessionmaker(bind=engine)
 session = Session()
 
-# results = session.query(Client).all()
 
+def view_clients():
 
-def view_clients(clients):
+    clients = session.query(Client).all()
+
     if clients:
         table = Table(title='Clients', show_lines=True, min_width=100)
 
@@ -50,8 +50,8 @@ def view_clients(clients):
         table.add_column("Total Amount Spent $", justify='right', style='green')
 
         for client in clients:
-            table.add_row(str(client['ID']), str(client['First Name']), str(client['Last Name']),
-                          str(client['Address']), str(client['Total Amount Spent']))
+            table.add_row(str(client.id), str(client.firstname), str(client.lastname),
+                          str(client.address), str(client.total_spent))
 
         console = Console()
         console.print(table)
@@ -59,59 +59,58 @@ def view_clients(clients):
         print("\nClient List:")
         pprint(clients, width=30)
     else:
-        print("No clients found.")
+        print()
+        print("No clients found!")
     print()
 
 
-def add_client(clients):
-    client = {}
+def add_client():
+    client = Client(id=0, first='', last='', address='', total_spent=0)
+
     while True:
         try:
-            client['ID'] = int(input("Enter client ID number: "))
+            client.id = int(input("Enter client ID number: "))
         except ValueError:
             print("Invalid option. Please enter a number.")
         else:
             break
 
     while True:
-        client['First Name'] = input("Enter client's first name: ").title()
-        if client['First Name'] == '' or client['First Name'].isdigit():
+        client.firstname = input("Enter client's first name: ").title()
+        if client.firstname == '' or client.firstname.isdigit():
             print("Invalid option. Please enter a name.")
         else:
             break
 
     while True:
-        client['Last Name'] = input("Enter client's last name: ").title()
-        if client['Last Name'] == '' or client['Last Name'].isdigit():
+        client.lastname = input("Enter client's last name: ").title()
+        if client.lastname == '' or client.lastname.isdigit():
             print("Invalid option. Please enter a name.")
         else:
             break
 
     while True:
-        client['Address'] = input("Enter client address: ").title()
-        if client['Address'] == '' or client['Address'].isdigit():
+        client.address = input("Enter client address: ").title()
+        if client.address == '' or client.address.isdigit():
             print("Invalid option. Please enter an address.")
         else:
             break
 
     while True:
         try:
-            client['Total Amount Spent'] = int(input("Enter total amount spent: "))
+            client.total_spent = int(input("Enter total amount spent: "))
         except ValueError:
             print("Invalid option. Please enter a number.")
         else:
             break
-    clients.append(client)
 
-    # client = Client(client['ID'], client['First Name'], client['Last Name'], client['Address'], client['Total Amount Spent'])
-    id = client["ID"]
-    first = client["First Name"]
-    last = client["Last Name"]
-    address = client["Address"]
-    total_spent = client["Total Amount Spent"]
-
+    id = client.id
+    first = client.firstname
+    last = client.lastname
+    address = client.address
+    total_spent = client.total_spent
+    #
     client = Client(id, first, last, address, total_spent)
-
 
     session.add(client)
     session.commit()
@@ -120,72 +119,82 @@ def add_client(clients):
     print("Client added successfully!\n")
 
 
-def find_client_by_id(clients, client_id):
-    for client in clients:
-        if client['ID'] == int(client_id):
-
-            return client
-    return None
-
-
-def edit_client(clients):
-    print(clients)
-    client_id = input("Enter client ID to edit: ")
-    client = find_client_by_id(clients, client_id)
-
-    if client:
-        print("\nClient Details:")
-        print("ID:", client['ID'])
-        print("First Name:", client['First Name'])
-        print("Last Name:", client['Last Name'])
-        print("Address:", client['Address'])
-        print("Total Amount Spent:", client['Total Amount Spent'])
-
-        new_client_id = input("\nEnter updated client ID (press Enter to keep current): ")
-        if new_client_id:
-            client['ID'] = new_client_id
-
-        new_client_first_name = input("Enter updated client first name (press Enter to keep current): ").title()
-        if new_client_first_name:
-            client['First Name'] = new_client_first_name
-
-        new_client_last_name = input("Enter updated client last name (press Enter to keep current): ").title()
-        if new_client_last_name:
-            client['Last Name'] = new_client_last_name
-
-        new_client_address = input("Enter updated client address (press Enter to keep current): ").title()
-        if new_client_address:
-            client['Address'] = new_client_address
-
-        while True:
-            new_amount_spent = input("Enter updated total amount spent (press Enter to keep current): ")
-            if new_amount_spent == '':
-                break
-            elif new_amount_spent.isdigit():
-                client["Total Amount Spent"] = new_amount_spent
-                break
-            else:
-                print("Invalid option. Please enter a number.")
-
-        print("Client details updated successfully!")
+def find_client_by_id():
+    client_id = input("Enter client ID to look for: ")
+    details = session.query(Client).filter(Client.id == client_id).first()
+    if details:
+        print("======= Client Details ======")
+        print(details.firstname, " - ", details.lastname)
+        print()
     else:
-        print("Client not found.")
+        return None
+    return client_id
+
+
+def edit_client():
+    client_id = find_client_by_id()
+    if client_id:
+        client = session.get(Client, client_id)
+
+        if client:
+            print("\nClient Details:")
+            print("ID:", client.id)
+            print("First Name:", client.firstname)
+            print("Last Name:", client.lastname)
+            print("Address:", client.address)
+            print("Total Amount Spent:", client.total_spent)
+
+            new_client_id = input("\nEnter updated client ID (press Enter to keep current): ")
+            if new_client_id:
+                client.id = new_client_id
+
+            new_client_first_name = input("Enter updated client first name (press Enter to keep current): ").title()
+            if new_client_first_name:
+                client.firstname = new_client_first_name
+
+            new_client_last_name = input("Enter updated client last name (press Enter to keep current): ").title()
+            if new_client_last_name:
+                client.lastname = new_client_last_name
+
+            new_client_address = input("Enter updated client address (press Enter to keep current): ").title()
+            if new_client_address:
+                client.address = new_client_address
+
+            while True:
+                new_amount_spent = input("Enter updated total amount spent (press Enter to keep current): ")
+                if new_amount_spent == '':
+                    break
+                elif new_amount_spent.isdigit():
+                    client.total_spent = new_amount_spent
+                    break
+                else:
+                    print("Invalid option. Please enter a number.")
+
+            print("Client details updated successfully!")
+    else:
+        print()
+        print("Client not found!")
     print()
 
-def delete_client(clients):
-    client_id = input("Enter client ID to delete: ")
-    client = find_client_by_id(clients, client_id)
-    if client:
-        clients.remove(client)
-        print("Client deleted successfully!")
+
+def delete_client():
+    client_id = find_client_by_id()
+    if client_id:
+        client = session.get(Client, client_id)
+
+        if client:
+            session.delete(client)
+
+            print("*" * 29)
+            print("Client deleted successfully!")
+            print()
     else:
-        print("Client not found.")
+        print()
+        print("Client not found!")
     print()
 
 
 def main():
-    clients = []
-
     while True:
         print("*" * 29)
         print("Welcome to ClientManager v1.0")
@@ -197,19 +206,22 @@ Select the number of your choice to display screen:
     [2] - Add a client
     [3] - Edit a client
     [4] - Delete a client
-    [5] - Exit
+    [5] - Get client details
+    [6] - Exit
 """
         choice = input(prompt)
 
         if choice == '1':
-            view_clients(clients)
+            view_clients()
         elif choice == '2':
-            add_client(clients)
+            add_client()
         elif choice == '3':
-            edit_client(clients)
+            edit_client()
         elif choice == '4':
-            delete_client(clients)
+            delete_client()
         elif choice == '5':
+            find_client_by_id()
+        elif choice == '6':
             break
         else:
             print("Invalid choice. Please try again.")
