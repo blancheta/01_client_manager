@@ -145,6 +145,7 @@ def find_client_by_lastname():
 
 
 def edit_client():
+    view_clients()
     client_id = find_client_by_id()
     if client_id:
         client = session.get(Client, client_id)
@@ -192,6 +193,7 @@ def edit_client():
 
 
 def delete_client():
+    view_clients()
     client_id = find_client_by_id()
     if client_id:
         while True:
