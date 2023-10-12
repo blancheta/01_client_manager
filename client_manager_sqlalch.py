@@ -27,17 +27,17 @@ class Client(Base):
         self.total_spent = total_spent
 
     def __repr__(self):
-        return f"({self.id}) {self.firstname} {self.lastname} ({self.address}, {self.total_spent})"
+        return f"({self.id}) {self.firstname} {self.lastname} ({self.address}), ({self.total_spent})"
 
 
 engine = create_engine("sqlite:///mydb_client_manager.db", echo=True)
 Base.metadata.create_all(bind=engine)
+
 Session = sessionmaker(bind=engine)
 session = Session()
 
 
 def view_clients():
-
     clients = session.query(Client).all()
 
     if clients:
@@ -109,7 +109,7 @@ def add_client():
     last = client.lastname
     address = client.address
     total_spent = client.total_spent
-    #
+
     client = Client(id, first, last, address, total_spent)
 
     session.add(client)
@@ -123,12 +123,25 @@ def find_client_by_id():
     client_id = input("Enter client ID to look for: ")
     details = session.query(Client).filter(Client.id == client_id).first()
     if details:
-        print("======= Client Details ======")
-        print(details.firstname, " - ", details.lastname)
+        print("\n======= Client Details ======")
+        print(details.id, " | ", details.firstname, " - ", details.lastname)
         print()
     else:
         return None
     return client_id
+
+
+def find_client_by_lastname():
+    client_lastname = input("Enter client last name to look for: ").title()
+    results = session.query(Client).filter(Client.lastname == client_lastname).all()
+    if results:
+        print("\n======= Client(s) Details ======\n")
+        for result in results:
+            print(result)
+            print()
+    else:
+        print("\nClient not found. Retry.\n")
+    return client_lastname
 
 
 def edit_client():
@@ -169,7 +182,7 @@ def edit_client():
             else:
                 print("Invalid option. Please enter a number.")
 
-        session.commit() # added, otherwise the db will not update
+        session.commit()
 
         print("Client details updated successfully!")
     else:
@@ -181,15 +194,21 @@ def edit_client():
 def delete_client():
     client_id = find_client_by_id()
     if client_id:
-        client = session.get(Client, client_id)
-
-        session.delete(client)
-        session.commit() # added, otherwise the db will not update
-
-        print("*" * 29)
-        print()
-        print("Client deleted successfully!")
-        print()
+        while True:
+            client = session.get(Client, client_id)
+            confirm = input("\nDo you want to delete this contact y/n? ")
+            if confirm.lower() == 'y':
+                session.delete(client)
+                session.commit()
+                print()
+                print("*" * 29)
+                print("Client deleted successfully!")
+                print("*" * 29)
+                break
+            elif confirm.lower() == 'n':
+                break
+            else:
+                print("Invalid option. Try again.")
     else:
         print()
         print("Client not found!")
@@ -207,8 +226,8 @@ Select the number of your choice to display screen:
     [1] - Print my clients
     [2] - Add a client
     [3] - Edit a client
-    [4] - Delete a client
-    [5] - Get client details
+    [4] - Get client details
+    [5] - Delete a client
     [6] - Exit
 """
         choice = input(prompt)
@@ -220,9 +239,15 @@ Select the number of your choice to display screen:
         elif choice == '3':
             edit_client()
         elif choice == '4':
-            delete_client()
+            id_or_lastname = input("Do you want by client id or by client lastname? Type 'id' or 'last': ").lower()
+            if id_or_lastname == 'id':
+                find_client_by_id()
+            elif id_or_lastname == 'last':
+                find_client_by_lastname()
+            else:
+                print('Invalid choice. Try again')
         elif choice == '5':
-            find_client_by_id()
+            delete_client()
         elif choice == '6':
             break
         else:
@@ -231,5 +256,4 @@ Select the number of your choice to display screen:
 
 if __name__ == "__main__":
     main()
-
 
