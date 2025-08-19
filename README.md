@@ -21,6 +21,7 @@ Welcome to CliManager v1.0
 Select the number of your choice to display screen
 [1] - Print my clients
 [2] - Add a client
+[3] - Edit a client
 [4] - Delete a client
 [5] - Exit
 ```
