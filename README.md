@@ -1,11 +1,5 @@
 ## Client Manager
 
-```
-# Install pip dependency manager
-python get-pip.py --user
-pip install faker
-```
-
 Bonus:
 
 https://rich.readthedocs.io/en/stable/introduction.html
